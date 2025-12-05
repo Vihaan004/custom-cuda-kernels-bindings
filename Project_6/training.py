@@ -153,10 +153,24 @@ class CUDANeuralNetwork:
         lib.free_gpu_memory.restype = None
 
         # implement your code here - done
-        lib.linear_forward_wrapper.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+
+        lib.copy_to_gpu.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_float), ctypes.c_size_t]
+        lib.copy_to_gpu.restype = None
+
+        lib.copy_from_gpu.argtypes = [ctypes.POINTER(ctypes.c_float), ctypes.c_void_p, ctypes.c_size_t]
+        lib.copy_from_gpu.restype = None
+
+        lib.linear_forward_wrapper.argtypes = [
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
+            ctypes.c_int, ctypes.c_int, ctypes.c_int
+        ]
         lib.linear_forward_wrapper.restype = None
 
-        lib.linear_backward_wrapper.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+        lib.linear_backward_wrapper.argtypes = [
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
+            ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p,
+            ctypes.c_int, ctypes.c_int, ctypes.c_int
+        ]
         lib.linear_backward_wrapper.restype = None
 
         return lib
@@ -257,6 +271,9 @@ class CUDANeuralNetwork:
         self.gpu_hidden = self.linear_lib.allocate_gpu_memory(
             self.max_batch_size * self.hidden_size
         )
+        # self.gpu_hidden_pre_relu = self.linear_lib.allocate_gpu_memory(
+        #     self.max_batch_size * self.hidden_size
+        # )
         self.gpu_output = self.linear_lib.allocate_gpu_memory(
             self.max_batch_size * self.output_size
         )
@@ -479,6 +496,7 @@ class CUDANeuralNetwork:
         if hasattr(self, "linear_lib"):
             self.linear_lib.free_gpu_memory(self.gpu_input)
             self.linear_lib.free_gpu_memory(self.gpu_hidden)
+            # self.linear_lib.free_gpu_memory(self.gpu_hidden_pre_relu)
             self.linear_lib.free_gpu_memory(self.gpu_output)
             self.linear_lib.free_gpu_memory(self.gpu_W1)
             self.linear_lib.free_gpu_memory(self.gpu_b1)

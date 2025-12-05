@@ -106,8 +106,8 @@ extern "C"
     {
         // implement your code here - done
         dim3 threads_per_block(256);
-        dim3 num_blocks((output_size + threads_per_block.x - 1) / threads_per_block.x, batch_size);
-        linear_forward_kernel<<<num_blocks, threads_per_block>>>(
+        dim3 number_blocks((output_size + threads_per_block.x - 1) / threads_per_block.x, batch_size);
+        linear_forward_kernel<<<number_blocks, threads_per_block>>>(
             input, weight, bias, output, batch_size, input_size, output_size);
         cudaDeviceSynchronize();
     }
